@@ -1,0 +1,41 @@
+name: Nightly Test Fix
+
+description: >
+  Every night, run the test suite against the main branch. If any tests are
+  failing, identify the root cause, implement the smallest fix that makes them
+  pass, and open a draft pull request with a clear explanation of what changed.
+
+triggers:
+  - type: schedule
+    interval: daily
+    time: "02:00"
+    timezone: UTC
+
+tools:
+  - read_file
+  - run_terminal_command
+  - create_or_update_file
+  - push_to_branch
+  - create_pull_request
+
+prompt: >
+  Run the test suite for this repository using the following command:
+
+    pip install -r requirements.txt && pytest test_validator.py -v
+
+  If all tests pass, do nothing and stop.
+
+  If any tests are failing:
+
+  1. Read the failure output carefully to understand what is wrong.
+  2. Locate the root cause in validator.py or test_validator.py.
+  3. Implement the minimal fix needed to make the failing tests pass without
+     breaking any currently passing tests.
+  4. Push the changes to a new branch named fix/nightly-<YYYY-MM-DD>.
+  5. Open a DRAFT pull request with:
+     - Title: fix: nightly test repair <YYYY-MM-DD>
+     - A short description of which tests were failing and what you changed
+     - The full pytest output before and after the fix, pasted as a code block
+
+  Do not refactor working code. Do not change function signatures unless the
+  fix requires it. Keep the change as small as possible.
